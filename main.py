@@ -1,17 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
-import tkinter.messagebox as mb
 import tkinter as tk
 import tkinter.filedialog as fd
-WAV_PATH = 'jopa.wav'
+WAV_PATH = 'krokodil.wav'
 
 
 def set_wav():
     filetypes = (("Текстовый файл", "*.wav"),)
     filename = fd.askopenfilename(title="Выбрать файл", initialdir="/", filetypes=filetypes)
     if filename:
-        # substring = string.rsplit("/", 1)[-1]
         file = filename.rsplit("/", 1)[-1]
         global WAV_PATH
         WAV_PATH = filename
@@ -50,14 +48,22 @@ def plot_frequency_response(signal, title):
     plt.show()
 
 
-# Реализация процедуры ЦФ
+# region Реализация процедуры ЦФ
 # 0.5 x(n) + 0.25x(n-1) +0.25x(n-2) = y(n).
 def filter_function_four(input_signal):
     output_signal = np.zeros_like(input_signal)
     for i in range(2, len(input_signal)):
-        output_signal[i] = input_signal[i] + 0.5 * input_signal[i-1] + 0.5 * input_signal[i-2]
+        output_signal[i] = 0.5 * input_signal[i] + 0.25 * input_signal[i-1] + 0.25 * input_signal[i-2]
     return output_signal
 
+
+# x(n) -0.5x(n-1) +0.5 x(n-2) + 0.5y(n-1) = y(n)
+def filter_function_ten(input_signal):
+    output_signal = np.zeros_like(input_signal)
+    for i in range(2, len(input_signal)):
+        output_signal[i] = input_signal[i] - 0.5 * input_signal[i-1] + 0.5 * input_signal[i-2] + 0.5 * output_signal[i-1]
+    return output_signal
+# endregion
 
 # Основная функция программы
 def main():
@@ -94,7 +100,7 @@ if __name__ == "__main__":
               bg='#7FFFD4', activebackground="#00FF00", width=50, height=1).place(x=550, y=210)
 
     # жахнем
-    button_send_message = tk.Button(win, text='Начинаем', bg='#7FFFD4', activebackground="#00FF00",
-                                    fg='black', command=main, width=40, height=3)
-    button_send_message.place(x=860, y=70)
+    start_button = tk.Button(win, text='Начинаем', bg='#7FFFD4', activebackground="#00FF00",
+                             fg='black', command=main, width=40, height=3)
+    start_button.place(x=860, y=70)
     win.mainloop()
